@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能闪卡学习系统 - 第四课单词</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 800px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            flex: 1;
+            margin: 0 10px;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        .group-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+        
+        .group-btn {
+            padding: 10px 20px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 50px;
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .group-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .group-btn.active {
+            background: #2c3e50;
+        }
+        
+        .group-btn.locked {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+        
+        .flashcard-container {
+            width: 100%;
+            max-width: 500px;
+            height: 300px;
+            perspective: 1000px;
+            margin-bottom: 30px;
+        }
+        
+        .flashcard {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+        }
+        
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-front {
+            background: white;
+            color: #2c3e50;
+        }
+        
+        .card-back {
+            background: #3498db;
+            color: white;
+            transform: rotateY(180deg);
+            justify-content: space-between;
+        }
+        
+        .word {
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .hint {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-top: 15px;
+        }
+        
+        .repeat-count {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.8rem;
+        }
+        
+        .translation {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .memory-aid {
+            font-size: 1rem;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            width: 100%;
+        }
+        
+        .buttons-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            margin: 0 10px;
+        }
+        
+        .btn-know {
+            background: #2ecc71;
+            color: white;
+        }
+        
+        .btn-dont-know {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .progress-container {
+            width: 100%;
+            max-width: 500px;
+            margin-top: 20px;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background: #ecf0f1;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: #3498db;
+            border-radius: 5px;
+            transition: width 0.5s;
+        }
+        
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .tts-btn {
+            background: none;
+            border: none;
+            color: #3498db;
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: transform 0.2s;
+        }
+        
+        .tts-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .timer {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .completion-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-title {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+        
+        .time-stats {
+            margin-bottom: 20px;
+        }
+        
+        .time-stat {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .word-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .word-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .close-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        
+        .close-btn:hover {
+            background: #2980b9;
+        }
+        
+        @media (max-width: 600px) {
+            .stats-container {
+                flex-direction: column;
+            }
+            
+            .stat-card {
+                margin: 5px 0;
+            }
+            
+            .flashcard-container {
+                height: 250px;
+            }
+            
+            .word {
+                font-size: 2rem;
+            }
+            
+            .translation {
+                font-size: 1.5rem;
+            }
+            
+            .group-selector {
+                flex-wrap: wrap;
+            }
+            
+            .group-btn {
+                margin: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>智能闪卡学习系统 - 第四课单词</h1>
+        <p class="subtitle">分组学习，循序渐进，巩固记忆</p>
+    </div>
+    
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-value" id="total-words">0</div>
+            <div class="stat-label">总单词数</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="mastered-words">0</div>
+            <div class="stat-label">已掌握</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="remaining-words">0</div>
+            <div class="stat-label">待学习</div>
+        </div>
+    </div>
+    
+    <div class="group-selector">
+        <button class="group-btn active" id="group1-btn">第一组 (1-20)</button>
+        <button class="group-btn locked" id="group2-btn">第二组 (21-40)</button>
+        <button class="group-btn locked" id="group3-btn">第三组 (41-60)</button>
+    </div>
+    
+    <div class="timer" id="timer">用时: 00:00</div>
+    
+    <div class="flashcard-container">
+        <div class="flashcard" id="flashcard">
+            <div class="card-face card-front">
+                <div class="word" id="word-front">date</div>
+                <p class="hint">点击卡片查看释义</p>
+                <button class="tts-btn" id="tts-front">🔊</button>
+            </div>
+            <div class="card-face card-back">
+                <div class="repeat-count" id="repeat-count">0</div>
+                <div class="word" id="word-back">date</div>
+                <div class="translation" id="translation">n.日期;日子</div>
+                <div class="memory-aid" id="memory-aid">记忆提示: 与day(日子)相关</div>
+                <button class="tts-btn" id="tts-back">🔊</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="buttons-container">
+        <button class="btn btn-dont-know" id="btn-dont-know">不会</button>
+        <button class="btn btn-know" id="btn-know">会了</button>
+    </div>
+    
+    <div class="progress-container">
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+        <div class="progress-text" id="progress-text">0/0 (0%)</div>
+    </div>
+
+    <script>
+        // 单词数据 - 第四课单词
+        const wordData = [
+            {english: "date", chinese: "n.日期;日子", status: "unmastered", repeatCount: 0, memoryAid: "记忆提示: 与day(日子)相关"},
+            {english: "sports ground", chinese: "运动场;操场", status: "unmastered", repeatCount: 0, memoryAid: "sports(运动) + ground(场地) → 运动场"},
+            {english: "gym", chinese: "n.(=gymnasium)健身房;体育馆", status: "unmastered", repeatCount: 0, memoryAid: "gymnasium的缩写形式"},
+            {english: "team", chinese: "n.(游戏或运动的)队", status: "unmastered", repeatCount: 0, memoryAid: "联想: 一个团队一起工作"},
+            {english: "high", chinese: "adj.高的", status: "unmastered", repeatCount: 0, memoryAid: "反义词: low(低的)"},
+            {english: "rope", chinese: "n.绳", status: "unmastered", repeatCount: 0, memoryAid: "联想: 跳绳用的绳子"},
+            {english: "kick", chinese: "v踢", status: "unmastered", repeatCount: 0, memoryAid: "发音类似'踢克'，帮助记忆"},
+            {english: "rock", chinese: "n.岩石", status: "unmastered", repeatCount: 0, memoryAid: "联想: 摇滚乐(rock music)"},
+            {english: "climb", chinese: "v 攀登;爬", status: "unmastered", repeatCount: 0, memoryAid: "联想: 爬山(climb mountains)"},
+            {english: "rock climbing", chinese: "攀岩", status: "unmastered", repeatCount: 0, memoryAid: "rock(岩石) + climbing(攀登) → 攀岩"},
+            {english: "kung fu", chinese: "n.功夫(中国拳术)", status: "unmastered", repeatCount: 0, memoryAid: "中文'功夫'的音译"},
+            {english: "frisbee", chinese: "n.弗里斯比飞盘投掷游戏用的飞碟", status: "unmastered", repeatCount: 0, memoryAid: "品牌名称Frisbee的音译"},
+            {english: "active", chinese: "adj.活跃的;充满活力的;积极的", status: "unmastered", repeatCount: 0, memoryAid: "词根act(行动) + ive(形容词后缀) → 活跃的"},
+            {english: "part", chinese: "n.部分", status: "unmastered", repeatCount: 0, memoryAid: "联想: participate(参与)的一部分"},
+            {english: "take part in", chinese: "参加", status: "unmastered", repeatCount: 0, memoryAid: "take(拿) + part(部分) + in(在...中) → 参加"},
+            {english: "baseball", chinese: "n.棒球运动", status: "unmastered", repeatCount: 0, memoryAid: "base(垒) + ball(球) → 棒球"},
+            {english: "volleyball", chinese: "n. 排球;排球运动", status: "unmastered", repeatCount: 0, memoryAid: "volley(截击) + ball(球) → 排球"},
+            {english: "badminton", chinese: "n.羽毛球运动", status: "unmastered", repeatCount: 0, memoryAid: "音译'巴德明顿'，源自英国地名"},
+            {english: "tennis", chinese: "n.网球", status: "unmastered", repeatCount: 0, memoryAid: "发音类似'坦尼斯'"},
+            {english: "pull", chinese: "v.拉；拔出", status: "unmastered", repeatCount: 0, memoryAid: "反义词: push(推)"},
+            {english: "safety", chinese: "n.安全；平安", status: "unmastered", repeatCount: 0, memoryAid: "safe(安全的) + ty(名词后缀) → 安全"},
+            {english: "ankle", chinese: "n.脚踝", status: "unmastered", repeatCount: 0, memoryAid: "发音类似'安扣'，脚踝像扣子一样连接脚和腿"},
+            {english: "match", chinese: "n.比赛", status: "unmastered", repeatCount: 0, memoryAid: "多义词: 比赛;火柴;匹配"},
+            {english: "gear", chinese: "n.(某种活动)设备，用具，衣服", status: "unmastered", repeatCount: 0, memoryAid: "发音类似'吉尔'，运动装备"},
+            {english: "example", chinese: "n.例子，实例", status: "unmastered", repeatCount: 0, memoryAid: "ex(出) + ample(拿) → 拿出来的东西 → 例子"},
+            {english: "for example", chinese: "例如", status: "unmastered", repeatCount: 0, memoryAid: "for(为了) + example(例子) → 例如"},
+            {english: "warm up", chinese: "（体育活动等前的）适应性活动，准备活动；热身练习", status: "unmastered", repeatCount: 0, memoryAid: "warm(温暖) + up(向上) → 热身"},
+            {english: "warm-up", chinese: "n.热身，准备活动", status: "unmastered", repeatCount: 0, memoryAid: "warm up的名词形式"},
+            {english: "watch out", chinese: "小心，留神；注意", status: "unmastered", repeatCount: 0, memoryAid: "watch(看) + out(外面) → 小心外面 → 注意"},
+            {english: "matter", chinese: "n.问题；事情", status: "unmastered", repeatCount: 0, memoryAid: "联想: What's the matter?(怎么了?)"},
+            {english: "what's the matter?", chinese: "怎么了？", status: "unmastered", repeatCount: 0, memoryAid: "what(什么) + matter(问题) → 怎么了?"},
+            {english: "happen", chinese: "v.发生", status: "unmastered", repeatCount: 0, memoryAid: "联想: happy(快乐) → 发生的事情"},
+            {english: "just", chinese: "adv.仅仅是，只是", status: "unmastered", repeatCount: 0, memoryAid: "多义词: 仅仅;刚才;正好"},
+            {english: "fall", chinese: "v.突然倒下，跌倒", status: "unmastered", repeatCount: 0, memoryAid: "多义词: 跌倒;秋天"},
+            {english: "guess", chinese: "v.猜测；估计", status: "unmastered", repeatCount: 0, memoryAid: "发音类似'盖斯'，猜测游戏"},
+            {english: "cut", chinese: "n.伤口；v.切，割", status: "unmastered", repeatCount: 0, memoryAid: "多义词: 切;伤口;削减"},
+            {english: "knee", chinese: "n.膝盖", status: "unmastered", repeatCount: 0, memoryAid: "发音类似'尼'，膝盖弯曲处"},
+            {english: "how come?", chinese: "怎么回事？怎么发生的？", status: "unmastered", repeatCount: 0, memoryAid: "how(如何) + come(来) → 怎么发生的?"},
+            {english: "seem", chinese: "v.好像；似乎；看来", status: "unmastered", repeatCount: 0, memoryAid: "发音类似'西姆'，看起来像"},
+            {english: "problem", chinese: "n.棘手的问题；难题；困难", status: "unmastered", repeatCount: 0, memoryAid: "pro(向前) + blem(投掷) → 投向前面的东西 → 问题"},
+            {english: "score", chinese: "v.得分；进球", status: "unmastered", repeatCount: 0, memoryAid: "多义词: 得分;乐谱;二十"},
+            {english: "goal", chinese: "n.目标；进球得得分；球门", status: "unmastered", repeatCount: 0, memoryAid: "多义词: 目标;球门;进球"},
+            {english: "goalkeeper", chinese: "n.守门员", status: "unmastered", repeatCount: 0, memoryAid: "goal(球门) + keeper(看守者) → 守门员"},
+            {english: "hold", chinese: "v.使……保持在某位置；拿着；抓住", status: "unmastered", repeatCount: 0, memoryAid: "多义词: 拿着;举行;保持"},
+            {english: "throw", chinese: "v.投掷；抛", status: "unmastered", repeatCount: 0, memoryAid: "发音类似'斯柔'，投掷动作"},
+            {english: "point", chinese: "n.得分；绩点", status: "unmastered", repeatCount: 0, memoryAid: "多义词: 点;得分;指向"},
+            {english: "control", chinese: "v.&n.控制；管理", status: "unmastered", repeatCount: 0, memoryAid: "contra(反对) + rol(滚动) → 控制滚动 → 控制"},
+            {english: "mind", chinese: "n.头脑；v.当心；注意", status: "unmastered", repeatCount: 0, memoryAid: "多义词: 头脑;介意;注意"},
+            {english: "powerful", chinese: "adj.强有力的", status: "unmastered", repeatCount: 0, memoryAid: "power(力量) + ful(形容词后缀) → 强有力的"},
+            {english: "style", chinese: "n.风格；样式", status: "unmastered", repeatCount: 0, memoryAid: "发音类似'斯代尔'，时尚风格"},
+            {english: "moment", chinese: "n.片刻；瞬间", status: "unmastered", repeatCount: 0, memoryAid: "联想: 重要时刻(important moment)"},
+            {english: "report", chinese: "v.&n.汇报；报道", status: "unmastered", repeatCount: 0, memoryAid: "re(回) + port(携带) → 带回来 → 报告"},
+            {english: "newspaper", chinese: "n.报纸", status: "unmastered", repeatCount: 0, memoryAid: "news(新闻) + paper(纸) → 报纸"},
+            {english: "court", chinese: "n.球场", status: "unmastered", repeatCount: 0, memoryAid: "多义词: 球场;法庭;庭院"},
+            {english: "against", chinese: "prep.与……对阵；反对，相反", status: "unmastered", repeatCount: 0, memoryAid: "again(再次) + st(站立) → 对立站着 → 反对"},
+            {english: "shoot", chinese: "v.射门；投篮", status: "unmastered", repeatCount: 0, memoryAid: "多义词: 射击;投篮;拍摄"},
+            {english: "basket", chinese: "n.篮球运动的篮筐", status: "unmastered", repeatCount: 0, memoryAid: "basket(篮子) + ball(球) → 篮球"},
+            {english: "tie", chinese: "v.得分相同", status: "unmastered", repeatCount: 0, memoryAid: "多义词: 平局;领带;系"},
+            {english: "bravo", chinese: "喝彩声：好哇", status: "unmastered", repeatCount: 0, memoryAid: "意大利语，表示喝彩"},
+            {english: "track", chinese: "n.跑道", status: "unmastered", repeatCount: 0, memoryAid: "多义词: 跑道;轨道;追踪"}
+        ];
+
+        // DOM元素
+        const flashcard = document.getElementById('flashcard');
+        const wordFront = document.getElementById('word-front');
+        const wordBack = document.getElementById('word-back');
+        const translation = document.getElementById('translation');
+        const memoryAid = document.getElementById('memory-aid');
+        const repeatCount = document.getElementById('repeat-count');
+        const btnKnow = document.getElementById('btn-know');
+        const btnDontKnow = document.getElementById('btn-dont-know');
+        const ttsFront = document.getElementById('tts-front');
+        const ttsBack = document.getElementById('tts-back');
+        const totalWords = document.getElementById('total-words');
+        const masteredWords = document.getElementById('mastered-words');
+        const remainingWords = document.getElementById('remaining-words');
+        const progress = document.getElementById('progress');
+        const progressText = document.getElementById('progress-text');
+        const timer = document.getElementById('timer');
+        const group1Btn = document.getElementById('group1-btn');
+        const group2Btn = document.getElementById('group2-btn');
+        const group3Btn = document.getElementById('group3-btn');
+
+        // 应用状态
+        let currentWordIndex = -1;
+        let currentGroup = 1;
+        let unmasteredWords = [];
+        let startTime = null;
+        let timerInterval = null;
+        let groupTimes = [0, 0, 0]; // 存储三组的学习时间（秒）
+        let currentGroupStartTime = null;
+
+        // 初始化应用
+        function initApp() {
+            // 初始化统计数据
+            updateStats();
+            
+            // 设置第一组单词
+            setGroup(1);
+            
+            // 开始计时
+            startTimer();
+            
+            // 绑定事件
+            flashcard.addEventListener('click', flipCard);
+            btnKnow.addEventListener('click', handleKnow);
+            btnDontKnow.addEventListener('click', handleDontKnow);
+            ttsFront.addEventListener('click', speakWord);
+            ttsBack.addEventListener('click', speakWord);
+            group1Btn.addEventListener('click', () => setGroup(1));
+            group2Btn.addEventListener('click', () => setGroup(2));
+            group3Btn.addEventListener('click', () => setGroup(3));
+        }
+
+        // 设置当前学习组
+        function setGroup(groupNum) {
+            // 如果尝试切换到未解锁的组，直接返回
+            if (groupNum > 1 && !isGroupUnlocked(groupNum)) {
+                return;
+            }
+            
+            // 保存当前组的学习时间
+            if (currentGroupStartTime) {
+                groupTimes[currentGroup-1] += Math.floor((Date.now() - currentGroupStartTime) / 1000);
+            }
+            
+            currentGroup = groupNum;
+            currentGroupStartTime = Date.now();
+            
+            // 更新按钮状态
+            updateGroupButtons();
+            
+            // 获取当前组的单词
+            const startIndex = (groupNum - 1) * 20;
+            const endIndex = startIndex + 20;
+            const groupWords = wordData.slice(startIndex, endIndex);
+            
+            // 获取未掌握的单词
+            unmasteredWords = groupWords.filter(word => word.status === 'unmastered');
+            
+            // 显示第一个单词
+            showNextWord();
+            
+            // 更新统计数据
+            updateStats();
+        }
+
+        // 检查组是否已解锁
+        function isGroupUnlocked(groupNum) {
+            if (groupNum === 1) return true;
+            
+            const prevGroupStart = (groupNum - 2) * 20;
+            const prevGroupEnd = prevGroupStart + 20;
+            const prevGroupWords = wordData.slice(prevGroupStart, prevGroupEnd);
+            
+            return prevGroupWords.every(word => word.status === 'mastered');
+        }
+
+        // 更新组按钮状态
+        function updateGroupButtons() {
+            group1Btn.classList.toggle('active', currentGroup === 1);
+            group2Btn.classList.toggle('active', currentGroup === 2);
+            group3Btn.classList.toggle('active', currentGroup === 3);
+            
+            group2Btn.classList.toggle('locked', !isGroupUnlocked(2));
+            group3Btn.classList.toggle('locked', !isGroupUnlocked(3));
+        }
+
+        // 更新统计数据
+        function updateStats() {
+            const total = 20; // 每组20个单词
+            const startIndex = (currentGroup - 1) * 20;
+            const endIndex = startIndex + 20;
+            const groupWords = wordData.slice(startIndex, endIndex);
+            
+            const mastered = groupWords.filter(word => word.status === 'mastered').length;
+            const remaining = total - mastered;
+            
+            totalWords.textContent = total;
+            masteredWords.textContent = mastered;
+            remainingWords.textContent = remaining;
+            
+            // 更新进度条
+            const progressPercentage = (mastered / total) * 100;
+            progress.style.width = `${progressPercentage}%`;
+            progressText.textContent = `${mastered}/${total} (${Math.round(progressPercentage)}%)`;
+            
+            // 检查当前组是否完成
+            if (remaining === 0) {
+                // 如果所有组都完成了
+                if (currentGroup === 3 && isGroupUnlocked(3)) {
+                    showCompletionModal();
+                } else if (currentGroup < 3) {
+                    // 自动解锁下一组
+                    setTimeout(() => {
+                        setGroup(currentGroup + 1);
+                    }, 1000);
+                }
+            }
+        }
+
+        // 显示下一个单词
+        function showNextWord() {
+            // 如果没有未掌握的单词，显示完成消息
+            if (unmasteredWords.length === 0) {
+                wordFront.textContent = "恭喜！";
+                wordBack.textContent = "恭喜！";
+                translation.textContent = "您已完成本组所有单词的学习";
+                memoryAid.textContent = "继续保持复习以巩固记忆";
+                repeatCount.textContent = "";
+                return;
+            }
+            
+            // 随机选择一个未掌握的单词
+            currentWordIndex = Math.floor(Math.random() * unmasteredWords.length);
+            const currentWord = unmasteredWords[currentWordIndex];
+            
+            // 更新卡片内容
+            wordFront.textContent = currentWord.english;
+            wordBack.textContent = currentWord.english;
+            translation.textContent = currentWord.chinese;
+            memoryAid.textContent = currentWord.memoryAid || "";
+            repeatCount.textContent = currentWord.repeatCount > 0 ? currentWord.repeatCount : "";
+            
+            // 确保卡片显示正面
+            flashcard.classList.remove('flipped');
+            
+            // 自动播放单词发音
+            setTimeout(speakWord, 300);
+        }
+
+        // 翻转卡片
+        function flipCard() {
+            flashcard.classList.toggle('flipped');
+        }
+
+        // 处理"会了"按钮点击
+        function handleKnow() {
+            if (currentWordIndex === -1 || unmasteredWords.length === 0) return;
+            
+            const currentWord = unmasteredWords[currentWordIndex];
+            
+            // 更新单词状态
+            currentWord.status = 'mastered';
+            currentWord.repeatCount = 0;
+            
+            // 从未掌握列表中移除
+            unmasteredWords.splice(currentWordIndex, 1);
+            
+            // 翻转卡片回正面
+            flashcard.classList.remove('flipped');
+            
+            // 延迟显示下一个单词，等待动画完成
+            setTimeout(() => {
+                updateStats();
+                showNextWord();
+            }, 600);
+        }
+
+        // 处理"不会"按钮点击
+        function handleDontKnow() {
+            if (currentWordIndex === -1 || unmasteredWords.length === 0) return;
+            
+            const currentWord = unmasteredWords[currentWordIndex];
+            
+            // 增加重复计数
+            currentWord.repeatCount += 1;
+            
+            // 翻转卡片回正面
+            flashcard.classList.remove('flipped');
+            
+            // 延迟显示下一个单词，等待动画完成
+            setTimeout(() => {
+                updateStats();
+                showNextWord();
+            }, 600);
+        }
+
+        // 朗读单词
+        function speakWord(event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            
+            const currentWord = unmasteredWords[currentWordIndex];
+            if (!currentWord) return;
+            
+            const utterance = new SpeechSynthesisUtterance(currentWord.english);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.8;
+            speechSynthesis.speak(utterance);
+        }
+
+        // 开始计时器
+        function startTimer() {
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        // 更新计时器显示
+        function updateTimer() {
+            if (!currentGroupStartTime) return;
+            
+            const currentTime = Date.now();
+            const elapsedSeconds = Math.floor((currentTime - currentGroupStartTime) / 1000);
+            
+            const minutes = Math.floor(elapsedSeconds / 60);
+            const seconds = elapsedSeconds % 60;
+            
+            timer.textContent = `用时: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // 显示完成模态框
+        function showCompletionModal() {
+            // 停止计时器
+            clearInterval(timerInterval);
+            
+            // 计算总时间
+            const totalTime = groupTimes.reduce((sum, time) => sum + time, 0);
+            
+            // 按重复次数排序单词
+            const sortedWords = [...wordData].sort((a, b) => b.repeatCount - a.repeatCount);
+            
+            // 创建模态框
+            const modal = document.createElement('div');
+            modal.className = 'completion-modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h2 class="modal-title">恭喜完成第四课所有单词学习！</h2>
+                    <div class="time-stats">
+                        <h3>各组学习用时</h3>
+                        <div class="time-stat">
+                            <span>第一组 (1-20):</span>
+                            <span>${formatTime(groupTimes[0])}</span>
+                        </div>
+                        <div class="time-stat">
+                            <span>第二组 (21-40):</span>
+                            <span>${formatTime(groupTimes[1])}</span>
+                        </div>
+                        <div class="time-stat">
+                            <span>第三组 (41-60):</span>
+                            <span>${formatTime(groupTimes[2])}</span>
+                        </div>
+                        <div class="time-stat" style="font-weight: bold; background: #e8f4fd;">
+                            <span>总计:</span>
+                            <span>${formatTime(totalTime)}</span>
+                        </div>
+                    </div>
+                    <h3>单词复习次数排名</h3>
+                    <div class="word-list">
+                        ${sortedWords.map((word, index) => `
+                            <div class="word-item">
+                                <span>${index + 1}. ${word.english} - ${word.chinese}</span>
+                                <span>复习次数: ${word.repeatCount}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="close-btn" id="close-modal">关闭</button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // 绑定关闭按钮事件
+            document.getElementById('close-modal').addEventListener('click', () => {
+                document.body.removeChild(modal);
+            });
+        }
+
+        // 格式化时间显示
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        // 初始化应用
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
